@@ -1,7 +1,13 @@
 export interface GetPlayerSummaryRequest {
-  id: number
+  id: string
 }
 
 export interface GetPlayerSummaryResponse {
-  id: number
+  steam_id: string
+  display_name: string
+  last_logoff: number
+  urls: {
+    profile: string
+    avatar: string
+  }
 }

@@ -2,7 +2,7 @@
 dist/
 
 # secret config files
-config/local.json
+config/local.js
 
 # Logs
 logs
