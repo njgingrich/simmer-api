@@ -1,6 +1,9 @@
 # Built Output
 dist/
 
+# secret config files
+config/local.json
+
 # Logs
 logs
 *.log
