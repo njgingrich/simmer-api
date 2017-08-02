@@ -4,12 +4,12 @@
   "description": "Steam api web view",
   "main": "dist/server",
   "types": "dist/server",
-  "author": "njgingrich <njgingrich@gmail.com>",
+  "author": "njgingrich <njgingrich@gmail.com> https://njgingrich.com",
   "license": "MIT",
   "scripts": {
     "compile": "./node_modules/.bin/tsc",
-    "start": "npm run dev",
-    "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./dist/server"
+    "start": "yarn run dev",
+    "dev": "yarn run compile && nodemon --exec ./node_modules/.bin/ts-node -- ./dist/server"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
@@ -17,12 +17,15 @@
     "@types/node": "^8.0.19",
     "body-parser": "^1.17.2",
     "nodemon": "^1.11.0",
+    "pug": "^1.11.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.5.0",
     "tslint-config-standard": "^6.0.1",
     "typescript": "^2.4.2"
   },
   "dependencies": {
-    "express": "^4.15.3"
+    "@types/pug": "^2.0.4",
+    "express": "^4.15.3",
+    "mkdirp": "^0.5.1"
   }
 }
