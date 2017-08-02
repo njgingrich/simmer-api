@@ -3,17 +3,23 @@ import { Router } from 'express'
 import * as api from '../api/'
 import { config } from '../config'
 import {
-  GetPlayerSummaryRequest,
-  GetPlayerSummaryResponse
+  GetPlayerSummaryResponse,
+  GetRecentGamesResponse,
 } from '../models/api'
 
 const users: Router = Router()
 
 users.get('/:id', function (req, res, next): void {
-  const r: GetPlayerSummaryRequest = { id: req.params.id }
-  api.getPlayerSummary(r)
-    .then((summary: GetPlayerSummaryResponse) => {
-      res.json(summary)
+  api.getPlayerSummary({ steam_id: req.params.id })
+    .then((response: GetPlayerSummaryResponse) => {
+      res.json(response)
+    })
+})
+
+users.get('/:id/recent', function (req, res, next): void {
+  api.getRecentGames({ steam_id: req.params.id })
+    .then((response: GetRecentGamesResponse) => {
+      res.json(response)
     })
 })
 

@@ -10,8 +10,7 @@ import {
 const games: Router = Router()
 
 games.get('/:id', function (req, res, next) {
-  const r: GetGameInfoRequest = { id: req.params.id }
-  api.getGameInfo(r)
+  api.getGameInfo({ steam_id: req.params.id })
     .then((info: GetGameInfoResponse) => {
       res.json(info)
     })

@@ -1,7 +1,7 @@
 {
-  "name": "simmer",
-  "version": "0.1.0",
-  "description": "Steam api web view",
+  "name": "simmer-api",
+  "version": "0.2.0",
+  "description": "Steam api web api calls for simmer",
   "main": "dist/src/server",
   "types": "dist/src/server",
   "author": "njgingrich <njgingrich@gmail.com> https://njgingrich.com",

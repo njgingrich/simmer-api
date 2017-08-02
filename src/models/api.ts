@@ -1,16 +1,16 @@
 export interface GetGameInfoRequest {
-  id: string
+  steam_id: string
 }
 
 export interface GetGameInfoResponse {
-  id: string
+  app_id: string
   name: string
   description: string
   screenshots: string[]
 }
 
 export interface GetPlayerSummaryRequest {
-  id: string
+  steam_id: string
 }
 
 export interface GetPlayerSummaryResponse {
@@ -21,4 +21,19 @@ export interface GetPlayerSummaryResponse {
     profile: string
     avatar: string
   }
+}
+
+export interface GetRecentGamesRequest {
+  steam_id: string
+}
+
+export interface GetRecentGamesResponse {
+  games: RecentGame[]
+}
+
+export interface RecentGame {
+  app_id: string
+  name: string
+  two_weeks: number
+  forever: number
 }

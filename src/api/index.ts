@@ -5,18 +5,45 @@ import {
   GetGameInfoRequest,
   GetGameInfoResponse,
   GetPlayerSummaryRequest,
-  GetPlayerSummaryResponse
+  GetPlayerSummaryResponse,
+  GetRecentGamesRequest,
+  GetRecentGamesResponse,
+  RecentGame
 } from '../models/api'
 
 const WEB_API_URL = 'http://api.steampowered.com/'
 const STORE_API_URL = 'http://store.steampowered.com/api/'
+
+export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
+  return request({
+    url: `${STORE_API_URL}appdetails`,
+    qs: {
+      appids: req.steam_id,
+    },
+    headers: {
+      'User-Agent': 'Request-Promise'
+    },
+    json: true,
+  }).then (response => {
+    response = response[req.steam_id]
+
+    return {
+      app_id: req.steam_id,
+      name: response.data.name,
+      description: response.data.short_description,
+      screenshots: response.data.screenshots.map( (s: any) =>  s.path_full )
+    }
+  }).catch (err => {
+    return err
+  })
+}
 
 export function getPlayerSummary (req: GetPlayerSummaryRequest): Promise<GetPlayerSummaryResponse> {
   return request({
     url: `${WEB_API_URL}ISteamUser/GetPlayerSummaries/v0002/`,
     qs: {
       key: config.api_key,
-      steamids: req.id,
+      steamids: req.steam_id,
     },
     headers: {
       'User-Agent': 'Request-Promise'
@@ -39,25 +66,31 @@ export function getPlayerSummary (req: GetPlayerSummaryRequest): Promise<GetPlay
   })
 }
 
-export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
+export function getRecentGames ( req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
   return request({
-    url: `${STORE_API_URL}appdetails`,
+    url: `${WEB_API_URL}IPlayerService/GetRecentlyPlayedGames/v0001/`,
     qs: {
-      appids: req.id,
+      key: config.api_key,
+      steamid: req.steam_id,
     },
     headers: {
       'User-Agent': 'Request-Promise'
     },
     json: true,
   }).then (response => {
-    response = response[req.id]
+    response = response.response.games
+    let games: RecentGame[] = []
+    response.forEach((r: any) => {
+      games.push({
+        app_id: r.appid,
+        name: r.name,
+        two_weeks: r.playtime_2weeks,
+        forever: r.playtime_forever,
+      })
+    })
 
-    return {
-      id: req.id,
-      name: response.data.name,
-      description: response.data.short_description,
-      screenshots: response.data.screenshots.map( (s: any) =>  s.path_full )
-    }
+    return games
+
   }).catch (err => {
     return err
   })
