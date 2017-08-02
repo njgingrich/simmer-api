@@ -1,3 +1,14 @@
+export interface GetGameInfoRequest {
+  id: string
+}
+
+export interface GetGameInfoResponse {
+  id: string
+  name: string
+  description: string
+  screenshots: string[]
+}
+
 export interface GetPlayerSummaryRequest {
   id: string
 }
