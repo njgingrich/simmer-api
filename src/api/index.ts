@@ -8,33 +8,54 @@ import {
   GetPlayerSummaryResponse,
   GetRecentGamesRequest,
   GetRecentGamesResponse,
+  HTTPStatus,
   RecentGame
 } from '../models/api'
 
 const WEB_API_URL = 'http://api.steampowered.com/'
 const STORE_API_URL = 'http://store.steampowered.com/api/'
+const defaultOptions = {
+  url: '',
+  method: 'GET',
+  mode: 'cors',
+  headers: {
+    'User-Agent': 'Request-Promise',
+  },
+  json: true,
+}
+
+function makeRequest (opts: object): Promise<any> {
+  const merged = Object.assign({}, defaultOptions, opts)
+  return request(merged)
+}
 
 export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
-  return request({
+  return makeRequest({
     url: `${STORE_API_URL}appdetails`,
     qs: {
-      appids: req.steam_id,
+      appids: req.app_id,
     },
-    headers: {
-      'User-Agent': 'Request-Promise'
-    },
-    json: true,
   }).then (response => {
-    response = response[req.steam_id]
+    response = response[req.app_id]
 
     return {
-      app_id: req.steam_id,
-      name: response.data.name,
-      description: response.data.short_description,
-      screenshots: response.data.screenshots.map( (s: any) =>  s.path_full )
+      status: HTTPStatus.OK,
+      result: {
+        app_id: req.app_id,
+        name: response.data.name,
+        image: response.data.header_image,
+        description: response.data.short_description,
+        screenshots: response.data.screenshots.map( (s: any) =>  s.path_full )
+      }
     }
-  }).catch (err => {
-    return err
+  }).catch (() => {
+    return {
+      status: HTTPStatus.BAD_REQUEST,
+      result: {
+        app_id: req.app_id,
+        message: 'Game was not found',
+      }
+    }
   })
 }
 
@@ -46,23 +67,31 @@ export function getPlayerSummary (req: GetPlayerSummaryRequest): Promise<GetPlay
       steamids: req.steam_id,
     },
     headers: {
-      'User-Agent': 'Request-Promise'
     },
     json: true,
   }).then (response => {
     response = response.response.players[0]
 
     return {
-      steam_id: response.steamid,
-      display_name: response.personaname,
-      last_logoff: response.lastlogoff,
-      urls: {
-        profile: response.profileurl,
-        avatar: response.avatarfull,
-      },
+      status: HTTPStatus.OK,
+      result: {
+        steam_id: response.steamid,
+        display_name: response.personaname,
+        last_logoff: response.lastlogoff,
+        urls: {
+          profile: response.profileurl,
+          avatar: response.avatarfull,
+        },
+      }
     }
-  }).catch (err => {
-    return err
+  }).catch (() => {
+    return {
+      status: HTTPStatus.BAD_REQUEST,
+      result: {
+        steam_id: req.steam_id,
+        message: 'User was not found',
+      }
+    }
   })
 }
 
@@ -89,9 +118,19 @@ export function getRecentGames ( req: GetRecentGamesRequest): Promise<GetRecentG
       })
     })
 
-    return games
-
-  }).catch (err => {
-    return err
+    return {
+      status: HTTPStatus.OK,
+      result: {
+        games
+      }
+    }
+  }).catch (() => {
+    return {
+      status: HTTPStatus.BAD_REQUEST,
+      result: {
+        steam_id: req.steam_id,
+        message: 'User was not found'
+      }
+    }
   })
 }

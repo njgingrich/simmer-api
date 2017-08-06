@@ -9,11 +9,16 @@ const app: express.Express = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'pug')
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  next()
+})
+
 installEndpoints(app)
 
-app.use((req: express.Request,
-         res: express.Response,
-         next: express.NextFunction) => {
+app.use((req, res, next) => {
   const err = new Error('Not Found')
   err['status'] = 404
   next(err)
