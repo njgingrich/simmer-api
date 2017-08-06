@@ -1,16 +1,17 @@
 {
   "name": "simmer-api",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Steam api web api calls for simmer",
-  "main": "dist/src/server",
-  "types": "dist/src/server",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "author": "njgingrich <njgingrich@gmail.com> https://njgingrich.com",
   "license": "MIT",
   "scripts": {
     "compile": "rm -rf dist && ./node_modules/.bin/tsc",
     "start": "yarn run dev",
     "dev": "yarn run compile && nodemon --exec ./node_modules/.bin/ts-node -- ./dist/src/server",
-    "test": "NODE_ENV=test mocha --opts mocha.opts"
+    "test": "NODE_ENV=test mocha --opts mocha.opts",
+    "prepublishOnly": "rm -rf dist && ./node_modules/.bin/tsc -p ./ --outDir dist/"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
