@@ -1,15 +1,12 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint-config-standard"
-    ],
-    "jsRules": {},
-    "rules": {
-        "no-multi-spaces": false,
-        "trailing-comma": [
-            true
-        ],
-        "variable-name": false
-    },
-    "rulesDirectory": []
+  "defaultSeverity": "error",
+  "extends": ["tslint-config-standard"],
+  "jsRules": {},
+  "rules": {
+    "no-multi-spaces": false,
+    "trailing-comma": [true],
+    "variable-name": false,
+    "space-before-function-paren": false
+  },
+  "rulesDirectory": []
 }
