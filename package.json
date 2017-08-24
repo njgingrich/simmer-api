@@ -24,6 +24,7 @@
     "@types/pug": "^2.0.4",
     "@types/request": "^2.0.0",
     "@types/request-promise-native": "^1.0.6",
+    "@types/winston": "^2.3.5",
     "body-parser": "^1.17.2",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
@@ -34,7 +35,8 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.5.0",
     "tslint-config-standard": "^6.0.1",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "winston": "^2.3.1"
   },
   "dependencies": {
     "express": "^4.15.3",

@@ -1,3 +1,5 @@
+import * as winston from 'winston'
+
 import * as db from '../db'
 import {
   GetGameInfoRequest,
@@ -59,7 +61,7 @@ export function getUserSummary (req: GetUserSummaryRequest): Promise<GetUserSumm
 export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
   return db.query('SELECT id, name, description, image_url, screenshots FROM games WHERE id = $1', [req.app_id])
   .then((res: any) => {
-    console.log('res:', res)
+    winston.log('debug', 'GetGameInfo response:' + res)
     const game = res.rows[0]
     return {
       status: HTTPStatus.OK,
@@ -85,12 +87,8 @@ export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoRespon
 export function getRecentGamesForUser (req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
   return db.query('SELECT app_id, two_weeks FROM playtimes WHERE steam_id = $1', [req.steam_id])
   .then((res: any) => {
-    console.log('res:', res)
-    const games = res.rows.filter((game: any) => {
-      const intval = parseInt(game.two_weeks, 10)
-      console.log('intval:', intval)
-      return intval > 0
-    })
+    winston.log('debug', 'GetRecentGames response:' + res)
+    const games = res.rows.filter((game: any) => parseInt(game.two_weeks, 10) > 0)
     return {
       status: HTTPStatus.OK,
       result: {

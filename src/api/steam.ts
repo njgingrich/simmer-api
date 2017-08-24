@@ -1,4 +1,5 @@
 import * as request from 'request-promise-native'
+import * as winston from 'winston'
 
 import { config } from '../config'
 import * as db from '../db'
@@ -35,11 +36,11 @@ export function getGameInfo (req: GetGameInfoRequest): Promise<void> {
   }).then (response => {
     return db.putGameInfo(response)
 
-  }).then(info => {
-    console.log('inserted:', info)
+  }).then((res) => {
+    winston.log('debug', 'inserted GetGameInfo:', res)
 
   }).catch ((err) => {
-    console.log(`Error getting game info: ${err}`)
+    winston.log('error', `Error getting game info: ${err}`)
   })
 }
 
@@ -55,10 +56,10 @@ export function getUserSummary (req: GetUserSummaryRequest): Promise<void> {
     return db.putUserSummary(response)
 
   }).then((res) => {
-    console.log(res)
+    winston.log('debug', 'inserted GetUserSummary:', res)
 
   }).catch((err) => {
-    console.log(`Error inserting user summary: ${err}`)
+    winston.log('error', `Error inserting user summary: ${err}`)
   })
 }
 
@@ -82,9 +83,9 @@ export function getRecentGames (req: GetRecentGamesRequest): Promise<void> {
     return db.putUserPlaytimes(req.steam_id, games)
 
   }).then((res) => {
-    console.log(res)
+    winston.log('debug', 'inserted GetRecentGames:', res)
 
   }).catch((err) => {
-    console.log(`Error inserting playtime for user: ${err}`)
+    winston.log('error', `Error inserting playtime for user: ${err}`)
   })
 }

@@ -1,4 +1,5 @@
 import { Pool, QueryResult } from 'pg'
+import * as winston from 'winston'
 
 const pool = new Pool({
   host: 'localhost',
@@ -11,7 +12,7 @@ const pool = new Pool({
 export function query (text: string, params: any[]): Promise<QueryResult> {
   return pool.query(text, params)
   .catch(err => {
-    console.log('caught in query:', err)
+    winston.log('warning', 'caught in query:', err)
     return err
   })
 }
