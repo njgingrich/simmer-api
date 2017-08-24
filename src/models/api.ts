@@ -69,6 +69,7 @@ export interface UserSummary {
     profile: string
     avatar: string
   }
+  recent_games: string[]
   playtimes: {
     totals: {
       today: number

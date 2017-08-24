@@ -25,6 +25,7 @@ export function getUserSummary(req: GetUserSummaryRequest): Promise<GetUserSumma
         status: HTTPStatus.OK,
         result: {
           steam_id: user.id,
+          message: '',
           display_name: user.display_name,
           last_logoff: user.last_logoff,
           urls: {
@@ -38,6 +39,7 @@ export function getUserSummary(req: GetUserSummaryRequest): Promise<GetUserSumma
               two_weeks: 3,
               forever: 4,
             },
+            recent_games: [],
             games: [
               {
                 app_id: 'test',
@@ -84,7 +86,7 @@ export function getGameInfo(req: GetGameInfoRequest): Promise<GetGameInfoRespons
         status: HTTPStatus.NOT_FOUND,
         result: {
           app_id: req.app_id,
-          message: `Error getting game info: ${err}`,
+          message: `Error getting game info for app_id=${req.app_id}: ${err}`,
         },
       }
     })

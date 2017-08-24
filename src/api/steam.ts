@@ -36,7 +36,7 @@ export function getGameInfo(req: GetGameInfoRequest): Promise<void> {
       winston.log('debug', 'inserted GetGameInfo:', res)
     })
     .catch(err => {
-      winston.log('error', `Error getting game info: ${err}`)
+      winston.log('error', `Error getting game info with app_id=${req.app_id}: ${err}`)
     })
 }
 
