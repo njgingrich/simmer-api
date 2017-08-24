@@ -4,11 +4,8 @@ import { config } from '../config'
 import * as db from '../db'
 import {
   GetGameInfoRequest,
-  GetGameInfoResponse,
   GetUserSummaryRequest,
-  GetUserSummaryResponse,
   GetRecentGamesRequest,
-  GetRecentGamesResponse,
   HTTPStatus
 } from '../models/api'
 
@@ -29,25 +26,25 @@ function makeRequest (opts: object): Promise<any> {
   return request(merged)
 }
 
-export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
+export function getGameInfo (req: GetGameInfoRequest): Promise<void> {
   return makeRequest({
-    url: `${STORE_API_URL}appdetails`
-  }).then (response => {
-    db.putGameInfo(response)
-
-  }).catch (() => {
-    return {
-      status: HTTPStatus.BAD_REQUEST,
-      result: {
-        app_id: req.app_id,
-        message: 'Game was not found',
-      }
+    url: `${STORE_API_URL}appdetails`,
+    qs: {
+      appids: req.app_id
     }
+  }).then (response => {
+    return db.putGameInfo(response)
+
+  }).then(info => {
+    console.log('inserted:', info)
+
+  }).catch ((err) => {
+    console.log(`Error getting game info: ${err}`)
   })
 }
 
-export function getUserSummary (req: GetUserSummaryRequest): void {
-  makeRequest({
+export function getUserSummary (req: GetUserSummaryRequest): Promise<void> {
+  return makeRequest({
     url: `${WEB_API_URL}ISteamUser/GetPlayerSummaries/v0002/`,
     qs: {
       key: config.api_key,
@@ -55,14 +52,17 @@ export function getUserSummary (req: GetUserSummaryRequest): void {
     }
   }).then(response => {
     response = response.response.players[0]
-    db.putUserSummary(response)
+    return db.putUserSummary(response)
+
+  }).then((res) => {
+    console.log(res)
 
   }).catch((err) => {
     console.log(`Error inserting user summary: ${err}`)
   })
 }
 
-export function getRecentGames (req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
+export function getRecentGames (req: GetRecentGamesRequest): Promise<void> {
   return makeRequest({
     url: `${WEB_API_URL}IPlayerService/GetRecentlyPlayedGames/v0001/`,
     qs: {
@@ -79,7 +79,10 @@ export function getRecentGames (req: GetRecentGamesRequest): Promise<GetRecentGa
         forever: r.playtime_forever,
       })
     })
-    db.putUserPlaytimes(req.steam_id, games)
+    return db.putUserPlaytimes(req.steam_id, games)
+
+  }).then((res) => {
+    console.log(res)
 
   }).catch((err) => {
     console.log(`Error inserting playtime for user: ${err}`)

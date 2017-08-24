@@ -8,8 +8,7 @@ import {
   GetUserSummaryResponse,
   GetRecentGamesRequest,
   GetRecentGamesResponse,
-  HTTPStatus,
-  RecentGame
+  HTTPStatus
 } from '../src/models/api'
 
 const STEAM_ID = config.profile_id
@@ -80,7 +79,7 @@ describe('API', () => {
 
   describe('GetRecentGames', () => {
     it('should parse GetRecentGames correctly', (done) => {
-      api.getRecentGames({ steam_id: STEAM_ID })
+      api.getRecentGamesForUser({ steam_id: STEAM_ID })
         .then((json: any) => {
           expect(json.status).to.eq(HTTPStatus.OK)
           json = json.result
@@ -92,7 +91,7 @@ describe('API', () => {
         })
     })
     it('should return an error message if the user is not found', (done) => {
-      api.getRecentGames({ steam_id: '-1' })
+      api.getRecentGamesForUser({ steam_id: '-1' })
         .then((json: any) => {
           expect(json.status).to.eq(HTTPStatus.BAD_REQUEST)
           expect(json.result.steam_id).to.eq('-1')

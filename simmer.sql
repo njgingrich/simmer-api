@@ -31,5 +31,6 @@ CREATE TABLE IF NOT EXISTS playtimes (
   week integer NOT NULL,
   two_weeks integer NOT NULL,
   forever integer NOT NULL,
+  last_fetch timestamp NOT NULL,
   PRIMARY KEY(steam_id, app_id)
 );

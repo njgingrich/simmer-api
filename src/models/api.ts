@@ -7,7 +7,12 @@ export interface GetGameInfoRequest {
 
 export interface GetGameInfoResponse {
   status: HTTPStatus
-  result: GameInfo
+  result: GameInfo | GetGameInfoErr
+}
+
+export interface GetGameInfoErr {
+  app_id: string
+  message: string
 }
 
 /**
@@ -19,7 +24,11 @@ export interface GetUserSummaryRequest {
 
 export interface GetUserSummaryResponse {
   status: HTTPStatus
-  result: UserSummary
+  result: UserSummary | GetUserSummaryErr
+}
+export interface GetUserSummaryErr {
+  steam_id: string
+  message: string
 }
 
 /**
@@ -31,7 +40,12 @@ export interface GetRecentGamesRequest {
 
 export interface GetRecentGamesResponse {
   status: HTTPStatus
-  result: RecentGames
+  result: RecentGames | GetRecentGamesErr
+}
+
+export interface GetRecentGamesErr {
+  steam_id: string
+  message: string
 }
 
 /**

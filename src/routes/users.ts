@@ -17,7 +17,7 @@ users.get('/:id', function (req, res, next): void {
 })
 
 users.get('/:id/recent', function (req, res, next): void {
-  api.getRecentGames({ steam_id: req.params.id })
+  api.getRecentGamesForUser({ steam_id: req.params.id })
     .then((response: GetRecentGamesResponse) => {
       res.json(response)
     })

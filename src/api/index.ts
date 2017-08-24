@@ -48,15 +48,18 @@ export function getUserSummary (req: GetUserSummaryRequest): Promise<GetUserSumm
   .catch((err: any) => {
     return {
       status: HTTPStatus.NOT_FOUND,
-      steam_id: req.steam_id,
-      message: `Error getting user summary: ${err}`
+      result: {
+        steam_id: req.steam_id,
+        message: `Error getting user summary: ${err}`
+      }
     }
   })
 }
 
 export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
-  return db.query('SELECT id, name, description, image_url, screenshots FROM users where id= $1', [req.app_id])
+  return db.query('SELECT id, name, description, image_url, screenshots FROM games WHERE id = $1', [req.app_id])
   .then((res: any) => {
+    console.log('res:', res)
     const game = res.rows[0]
     return {
       status: HTTPStatus.OK,
@@ -64,7 +67,7 @@ export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoRespon
         app_id: game.id,
         name: game.name,
         description: game.description,
-        image_url: game.image,
+        image_url: game.image_url,
         screenshots: game.screenshots,
       }
     }
@@ -72,25 +75,36 @@ export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoRespon
   .catch((err: any) => {
     return {
       status: HTTPStatus.NOT_FOUND,
-      app_id: req.app_id,
-      message: `Error getting game info: ${err}`
+      result: {
+        app_id: req.app_id,
+        message: `Error getting game info: ${err}`
+      }
     }
   })
 }
 export function getRecentGamesForUser (req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
-  return query('SELECT app_id FROM playtimes WHERE id = $1', [req.steam_id])
-  .then(res => {
-    const games = res.rows.filter(game => parseInt(game.two_weeks, 10) > 0)
+  return db.query('SELECT app_id, two_weeks FROM playtimes WHERE steam_id = $1', [req.steam_id])
+  .then((res: any) => {
+    console.log('res:', res)
+    const games = res.rows.filter((game: any) => {
+      const intval = parseInt(game.two_weeks, 10)
+      console.log('intval:', intval)
+      return intval > 0
+    })
     return {
       status: HTTPStatus.OK,
-      result: { games }
+      result: {
+        games: games.map((g: any) => g.app_id)
+      }
     }
   })
-  .catch(err => {
+  .catch((err: any) => {
     return {
       status: HTTPStatus.NOT_FOUND,
-      steam_id: req.steam_id,
-      message: `Error getting recent games: ${err}`
+      result: {
+        steam_id: req.steam_id,
+        message: `Error getting recent games: ${err}`
+      }
     }
   })
 }
