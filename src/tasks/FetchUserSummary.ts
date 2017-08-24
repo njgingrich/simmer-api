@@ -18,6 +18,9 @@ export class FetchUserSummaryTask extends Task {
     return steam
       .getUserSummary({ steam_id: this.steam_id })
       .then(() => {
+        return steam.getRecentGames({ steam_id: this.steam_id })
+      })
+      .then(() => {
         return true
       })
       .catch(() => {

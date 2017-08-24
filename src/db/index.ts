@@ -10,6 +10,7 @@ const pool = new Pool({
 })
 
 export function query(text: string, params: any[]): Promise<QueryResult> {
+  winston.log('debug', `PERFORMING QUERY => ${text}`)
   return pool
     .query(text, params)
     .then(res => {
@@ -38,6 +39,10 @@ export function putUserPlaytimes(steam_id: string, game: any) {
       'ON CONFLICT ON CONSTRAINT playtimes_pkey DO UPDATE SET today = $3, week = $4, two_weeks = $5, forever = $6, last_fetch = $7',
     [steam_id, game.app_id, today, week, game.two_weeks, game.forever, new Date().toISOString()]
   )
+}
+
+export function putUserRecentGames(steam_id: string, games: any) {
+  return query('UPDATE users SET recent_games = $1 WHERE id = $2', [games, steam_id])
 }
 
 export function putGameInfo(json: any): Promise<QueryResult> {

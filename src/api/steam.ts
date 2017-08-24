@@ -61,6 +61,7 @@ export function getUserSummary(req: GetUserSummaryRequest): Promise<void> {
 }
 
 export function getRecentGames(req: GetRecentGamesRequest): Promise<void> {
+  let games: any = []
   return makeRequest({
     url: `${WEB_API_URL}IPlayerService/GetRecentlyPlayedGames/v0001/`,
     qs: {
@@ -70,7 +71,6 @@ export function getRecentGames(req: GetRecentGamesRequest): Promise<void> {
   })
     .then(response => {
       response = response.response.games
-      let games: any[] = []
       response.forEach((r: any) => {
         games.push({
           app_id: r.appid,
@@ -78,11 +78,15 @@ export function getRecentGames(req: GetRecentGamesRequest): Promise<void> {
           forever: r.playtime_forever,
         })
       })
-      const promises = games.map(g => db.putUserPlaytimes(req.steam_id, g))
+      const promises = games.map((g: any) => db.putUserPlaytimes(req.steam_id, g))
       return Promise.all(promises)
     })
     .then(res => {
       winston.log('debug', 'inserted GetRecentGames:', res)
+      return db.putUserRecentGames(req.steam_id, games.map((g: any) => g.app_id))
+    })
+    .then(res => {
+      winston.log('debug', 'inserted UserRecentGames:', res)
     })
     .catch(err => {
       winston.log('error', `Error inserting playtime for user: ${err}`)
