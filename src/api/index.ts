@@ -1,136 +1,96 @@
-import * as request from 'request-promise-native'
-
-import { config } from '../config'
+import * as db from '../db'
 import {
   GetGameInfoRequest,
   GetGameInfoResponse,
-  GetPlayerSummaryRequest,
-  GetPlayerSummaryResponse,
   GetRecentGamesRequest,
   GetRecentGamesResponse,
-  HTTPStatus,
-  RecentGame
+  GetUserSummaryRequest,
+  GetUserSummaryResponse,
+  HTTPStatus
 } from '../models/api'
 
-const WEB_API_URL = 'http://api.steampowered.com/'
-const STORE_API_URL = 'http://store.steampowered.com/api/'
-const defaultOptions = {
-  url: '',
-  method: 'GET',
-  mode: 'cors',
-  headers: {
-    'User-Agent': 'Request-Promise',
-  },
-  json: true,
-}
-
-function makeRequest (opts: object): Promise<any> {
-  const merged = Object.assign({}, defaultOptions, opts)
-  return request(merged)
+export function getUserSummary (req: GetUserSummaryRequest): Promise<GetUserSummaryResponse> {
+  return db.query(`SELECT id, display_name, last_logoff, profile_url, avatar_url
+                 FROM users
+                 WHERE id = $1`, [req.steam_id])
+  .then((res: any) => {
+    const user = res.rows[0]
+    return {
+      status: HTTPStatus.OK,
+      result: {
+        steam_id: user.id,
+        display_name: user.display_name,
+        last_logoff: user.last_logoff,
+        urls: {
+          profile: user.profile_url,
+          avatar: user.avatar_url
+        },
+        playtimes: {
+          totals: {
+            today: 1,
+            week: 2,
+            two_weeks: 3,
+            forever: 4,
+          },
+          games: [
+            {
+              app_id: 'test',
+              today: 1,
+              week: 2,
+              two_weeks: 3,
+              forever: 4,
+            }
+          ]
+        }
+      }
+    }
+  })
+  .catch((err: any) => {
+    return {
+      status: HTTPStatus.NOT_FOUND,
+      steam_id: req.steam_id,
+      message: `Error getting user summary: ${err}`
+    }
+  })
 }
 
 export function getGameInfo (req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
-  return makeRequest({
-    url: `${STORE_API_URL}appdetails`,
-    qs: {
-      appids: req.app_id,
-    },
-  }).then (response => {
-    response = response[req.app_id]
-
+  return db.query('SELECT id, name, description, image_url, screenshots FROM users where id= $1', [req.app_id])
+  .then((res: any) => {
+    const game = res.rows[0]
     return {
       status: HTTPStatus.OK,
       result: {
-        app_id: req.app_id,
-        name: response.data.name,
-        image: response.data.header_image,
-        description: response.data.short_description,
-        screenshots: response.data.screenshots.map( (s: any) =>  s.path_full )
-      }
-    }
-  }).catch (() => {
-    return {
-      status: HTTPStatus.BAD_REQUEST,
-      result: {
-        app_id: req.app_id,
-        message: 'Game was not found',
+        app_id: game.id,
+        name: game.name,
+        description: game.description,
+        image_url: game.image,
+        screenshots: game.screenshots,
       }
     }
   })
-}
-
-export function getPlayerSummary (req: GetPlayerSummaryRequest): Promise<GetPlayerSummaryResponse> {
-  return request({
-    url: `${WEB_API_URL}ISteamUser/GetPlayerSummaries/v0002/`,
-    qs: {
-      key: config.api_key,
-      steamids: req.steam_id,
-    },
-    headers: {
-    },
-    json: true,
-  }).then (response => {
-    response = response.response.players[0]
-
+  .catch((err: any) => {
     return {
-      status: HTTPStatus.OK,
-      result: {
-        steam_id: response.steamid,
-        display_name: response.personaname,
-        last_logoff: response.lastlogoff,
-        urls: {
-          profile: response.profileurl,
-          avatar: response.avatarfull,
-        },
-      }
-    }
-  }).catch (() => {
-    return {
-      status: HTTPStatus.BAD_REQUEST,
-      result: {
-        steam_id: req.steam_id,
-        message: 'User was not found',
-      }
+      status: HTTPStatus.NOT_FOUND,
+      app_id: req.app_id,
+      message: `Error getting game info: ${err}`
     }
   })
 }
-
-export function getRecentGames ( req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
-  return request({
-    url: `${WEB_API_URL}IPlayerService/GetRecentlyPlayedGames/v0001/`,
-    qs: {
-      key: config.api_key,
-      steamid: req.steam_id,
-    },
-    headers: {
-      'User-Agent': 'Request-Promise'
-    },
-    json: true,
-  }).then (response => {
-    response = response.response.games
-    let games: RecentGame[] = []
-    response.forEach((r: any) => {
-      games.push({
-        app_id: r.appid,
-        name: r.name,
-        two_weeks: r.playtime_2weeks,
-        forever: r.playtime_forever,
-      })
-    })
-
+export function getRecentGamesForUser (req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
+  return query('SELECT app_id FROM playtimes WHERE id = $1', [req.steam_id])
+  .then(res => {
+    const games = res.rows.filter(game => parseInt(game.two_weeks, 10) > 0)
     return {
       status: HTTPStatus.OK,
-      result: {
-        games
-      }
+      result: { games }
     }
-  }).catch (() => {
+  })
+  .catch(err => {
     return {
-      status: HTTPStatus.BAD_REQUEST,
-      result: {
-        steam_id: req.steam_id,
-        message: 'User was not found'
-      }
+      status: HTTPStatus.NOT_FOUND,
+      steam_id: req.steam_id,
+      message: `Error getting recent games: ${err}`
     }
   })
 }

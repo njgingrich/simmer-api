@@ -3,15 +3,15 @@ import { Router } from 'express'
 import * as api from '../api/'
 import { config } from '../config'
 import {
-  GetPlayerSummaryResponse,
+  GetUserSummaryResponse,
   GetRecentGamesResponse,
 } from '../models/api'
 
 const users: Router = Router()
 
 users.get('/:id', function (req, res, next): void {
-  api.getPlayerSummary({ steam_id: req.params.id })
-    .then((response: GetPlayerSummaryResponse) => {
+  api.getUserSummary({ steam_id: req.params.id })
+    .then((response: GetUserSummaryResponse) => {
       res.json(response)
     })
 })

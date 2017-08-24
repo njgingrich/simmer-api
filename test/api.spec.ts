@@ -4,8 +4,8 @@ import { expect } from 'chai'
 import {
   GetGameInfoRequest,
   GetGameInfoResponse,
-  GetPlayerSummaryRequest,
-  GetPlayerSummaryResponse,
+  GetUserSummaryRequest,
+  GetUserSummaryResponse,
   GetRecentGamesRequest,
   GetRecentGamesResponse,
   HTTPStatus,
@@ -47,9 +47,9 @@ describe('API', () => {
     })
   })
 
-  describe('GetPlayerSummary', () => {
-    it('should parse GetPlayerSummary correctly', (done) => {
-      api.getPlayerSummary({ steam_id: STEAM_ID })
+  describe('GetUserSummary', () => {
+    it('should parse GetUserSummary correctly', (done) => {
+      api.getUserSummary({ steam_id: STEAM_ID })
         .then((json: any) => {
           expect(json.status).to.eq(HTTPStatus.OK)
           json = json.result
@@ -65,7 +65,7 @@ describe('API', () => {
         })
     })
     it('should return an error message if the user is not found', (done) => {
-      api.getPlayerSummary({ steam_id: '-1' })
+      api.getUserSummary({ steam_id: '-1' })
         .then((json: any) => {
           expect(json.status).to.eq(HTTPStatus.BAD_REQUEST)
           expect(json.result.steam_id).to.eq('-1')

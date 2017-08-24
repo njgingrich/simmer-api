@@ -1,53 +1,25 @@
 /**
- * Request & Response information for a GetGameInfo API call.
+ * Request & Response information for a GetGameInfo external API call.
  */
 export interface GetGameInfoRequest {
   app_id: string
 }
 
 export interface GetGameInfoResponse {
-  status: HTTPStatus,
-  result: GetGameInfoSuccess | GetGameInfoErr
-}
-
-export interface GetGameInfoSuccess {
-  app_id: string
-  name: string
-  image: string
-  description: string
-  screenshots: string[]
-}
-
-export interface GetGameInfoErr {
-  app_id: string
-  message: string
+  status: HTTPStatus
+  result: GameInfo
 }
 
 /**
- * Request & Response information for a GetPlayerSummary API call.
+ * Request & Response information for a GetPlayerSummary external API call.
  */
-export interface GetPlayerSummaryRequest {
+export interface GetUserSummaryRequest {
   steam_id: string
 }
 
-export interface GetPlayerSummaryResponse {
+export interface GetUserSummaryResponse {
   status: HTTPStatus
-  result: GetPlayerSummarySuccess | GetPlayerSummaryErr
-}
-
-export interface GetPlayerSummarySuccess {
-  steam_id: string
-  display_name: string
-  last_logoff: number
-  urls: {
-    profile: string
-    avatar: string
-  }
-}
-
-export interface GetPlayerSummaryErr {
-  steam_id: string
-  message: string
+  result: UserSummary
 }
 
 /**
@@ -59,23 +31,7 @@ export interface GetRecentGamesRequest {
 
 export interface GetRecentGamesResponse {
   status: HTTPStatus
-  result: GetRecentGamesSuccess | GetRecentGamesErr
-}
-
-export interface GetRecentGamesSuccess {
-  games: RecentGame[]
-}
-
-export interface GetRecentGamesErr {
-  steam_id: string
-  message: string
-}
-
-export interface RecentGame {
-  app_id: string
-  name: string
-  two_weeks: number
-  forever: number
+  result: RecentGames
 }
 
 /**
@@ -89,4 +45,43 @@ export enum HTTPStatus {
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
   NOT_FOUND = 404
+}
+
+export interface UserSummary {
+  steam_id: string
+  display_name: string
+  last_logoff: number
+  urls: {
+    profile: string
+    avatar: string
+  },
+  playtimes: {
+    totals: {
+      today: number
+      week: number
+      two_weeks: number
+      forever: number
+    }
+    games: Playtime[]
+  }
+}
+
+export interface Playtime {
+  app_id: string
+  today: number
+  week: number
+  two_weeks: number
+  forever: number
+}
+
+export interface GameInfo {
+  app_id: string
+  name: string
+  description: string
+  image_url: string
+  screenshots: string[]
+}
+
+export interface RecentGames {
+  games: string[]
 }
