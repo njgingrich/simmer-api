@@ -78,7 +78,8 @@ export function getRecentGames(req: GetRecentGamesRequest): Promise<void> {
           forever: r.playtime_forever,
         })
       })
-      return db.putUserPlaytimes(req.steam_id, games)
+      const promises = games.map(g => db.putUserPlaytimes(req.steam_id, g))
+      return Promise.all(promises)
     })
     .then(res => {
       winston.log('debug', 'inserted GetRecentGames:', res)

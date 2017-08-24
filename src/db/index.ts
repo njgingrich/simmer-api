@@ -10,59 +10,42 @@ const pool = new Pool({
 })
 
 export function query(text: string, params: any[]): Promise<QueryResult> {
-  return pool.query(text, params).catch(err => {
-    winston.log('warning', 'caught in query:', err)
-    return err
-  })
+  return pool
+    .query(text, params)
+    .then(res => {
+      winston.log('debug', 'result from query:', res)
+      return res
+    })
+    .catch(err => {
+      winston.log('error', 'CAUGHT IN QUERY:', err)
+      return err
+    })
 }
 
 export function putUserSummary(json: any): Promise<QueryResult> {
   return query(
-    'INSERT INTO users(id, display_name, last_logoff, profile_url, avatar_url, last_fetch) VALUES ($1, $2, to_timestamp($3), $4, $5, $6)',
+    'INSERT INTO users(id, display_name, last_logoff, profile_url, avatar_url, last_fetch) VALUES ($1, $2, to_timestamp($3), $4, $5, $6)' +
+      'ON CONFLICT (id) DO UPDATE SET display_name = $2, last_logoff = to_timestamp($3), profile_url = $4, avatar_url = $5, last_fetch = $6',
     [json.steamid, json.personaname, json.lastlogoff, json.profileurl, json.avatarfull, new Date().toISOString()]
   )
 }
 
-export function putUserPlaytimes(steam_id: string, gameJson: any): Promise<QueryResult> {
-  let rows: any[] = []
-  gameJson.forEach((game: any) => {
-    // TODO fix today/week
-    const today = game.two_weeks
-    const week = game.two_weeks
-    rows.push({
-      steam_id,
-      app_id: game.app_id,
-      today,
-      week,
-      two_weeks: game.two_weeks,
-      forever: game.forever,
-      last_fetch: new Date().toISOString(),
-    })
-  })
-  const params: any[] = []
-  const chunks: any[] = []
-  rows.forEach(row => {
-    const valueClause: any[] = []
-    Object.keys(row).forEach(p => {
-      params.push(row[p])
-      valueClause.push('$' + params.length)
-    })
-    chunks.push('(' + valueClause.join(', ') + ')')
-  })
-  const q = {
-    text:
-      'INSERT INTO playtimes(steam_id, app_id, today, week, two_weeks, forever, last_fetch) VALUES ' +
-      chunks.join(', '),
-    values: params,
-  }
-  return pool.query(q).catch(err => err)
+export function putUserPlaytimes(steam_id: string, game: any) {
+  const today = game.two_weeks
+  const week = game.two_weeks
+  return query(
+    'INSERT INTO playtimes(steam_id, app_id, today, week, two_weeks, forever, last_fetch) VALUES ($1, $2, $3, $4, $5, $6, $7)' +
+      'ON CONFLICT ON CONSTRAINT playtimes_pkey DO UPDATE SET today = $3, week = $4, two_weeks = $5, forever = $6, last_fetch = $7',
+    [steam_id, game.app_id, today, week, game.two_weeks, game.forever, new Date().toISOString()]
+  )
 }
 
 export function putGameInfo(json: any): Promise<QueryResult> {
   const app_id = Object.keys(json)[0]
   json = json[app_id].data
   return query(
-    'INSERT INTO games(id, name, description, image_url, screenshots, last_fetch) VALUES ($1, $2, $3, $4, $5, $6)',
+    'INSERT INTO games(id, name, description, image_url, screenshots, last_fetch) VALUES ($1, $2, $3, $4, $5, $6)' +
+      'ON CONFLICT (id) DO UPDATE SET name = $2, description = $3, image_url = $4, screenshots = $5, last_fetch = $6',
     [
       app_id,
       json.name,
