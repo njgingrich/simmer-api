@@ -1,7 +1,12 @@
-# simmer
-Steam web view for games n' stuff
+# simmer-api
+Server with a postgres database that stores steam info for a user about recently played games, and exposes an API to access it.
 
 ## Installation
+- Install postgres on your machine.
+- Update the config file with steam API key, user profile id, and postgres credentials.
+- `yarn resetdb`
+- `yarn install`
 
-- `npm run compile`
-- `npm start`
+## Running
+- `yarn run compile`
+- `yarn start`
