@@ -20,8 +20,15 @@ server.on('listening', () => {
 
 function setup(): void {
   winston.add(winston.transports.File, {
-    filename: 'logs/simmer.log',
+    name: 'file#debug',
+    filename: 'logs/simmer.debug.log',
     level: 'debug',
+    colorize: 'true',
+    timestamp: 'true',
+  })
+  winston.add(winston.transports.File, {
+    name: 'file#all',
+    filename: 'logs/simmer.log',
     colorize: 'true',
     timestamp: 'true',
   })
@@ -44,13 +51,4 @@ function setup(): void {
       }
     })
   }, 3000)
-  /*
-  steam
-    .getGameInfo({ app_id: '570' })
-    .then(() => api.getGameInfo({ app_id: '570' }))
-    .then(() => steam.getUserSummary({ steam_id: config.profile_id }))
-    .then(() => api.getUserSummary({ steam_id: config.profile_id }))
-    .then(() => steam.getRecentGames({ steam_id: config.profile_id }))
-    .then(() => api.getRecentGamesForUser({ steam_id: config.profile_id }))
-*/
 }
