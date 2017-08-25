@@ -66,7 +66,9 @@ export function getUserSummary(req: GetUserSummaryRequest): Promise<GetUserSumma
 
 export function getGameInfo(req: GetGameInfoRequest): Promise<GetGameInfoResponse> {
   return db
-    .query('SELECT id, name, description, image_url, screenshots FROM games WHERE id = $1', [req.app_id])
+    .query(`SELECT id, name, description, image_url, screenshots FROM games WHERE id = $1`, [
+      req.app_id,
+    ])
     .then((res: any) => {
       winston.log('debug', 'GetGameInfo response:' + res)
       const game = res.rows[0]
@@ -93,7 +95,7 @@ export function getGameInfo(req: GetGameInfoRequest): Promise<GetGameInfoRespons
 }
 export function getRecentGamesForUser(req: GetRecentGamesRequest): Promise<GetRecentGamesResponse> {
   return db
-    .query('SELECT app_id, two_weeks FROM playtimes WHERE steam_id = $1', [req.steam_id])
+    .query(`SELECT app_id, two_weeks FROM playtimes WHERE steam_id = $1`, [req.steam_id])
     .then((res: any) => {
       winston.log('debug', 'GetRecentGames response:' + res)
       const games = res.rows.filter((game: any) => parseInt(game.two_weeks, 10) > 0)

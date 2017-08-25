@@ -3,7 +3,12 @@ import * as winston from 'winston'
 
 import { config } from '../config'
 import * as db from '../db'
-import { GetGameInfoRequest, GetUserSummaryRequest, GetRecentGamesRequest, HTTPStatus } from '../models/api'
+import {
+  GetGameInfoRequest,
+  GetUserSummaryRequest,
+  GetRecentGamesRequest,
+  HTTPStatus,
+} from '../models/api'
 
 const WEB_API_URL = 'http://api.steampowered.com/'
 const STORE_API_URL = 'http://store.steampowered.com/api/'

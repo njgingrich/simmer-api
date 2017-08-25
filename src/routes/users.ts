@@ -13,9 +13,11 @@ users.get('/:id', function(req, res, next): void {
 })
 
 users.get('/:id/recent', function(req, res, next): void {
-  api.getRecentGamesForUser({ steam_id: req.params.id }).then((response: GetRecentGamesResponse) => {
-    res.json(response)
-  })
+  api
+    .getRecentGamesForUser({ steam_id: req.params.id })
+    .then((response: GetRecentGamesResponse) => {
+      res.json(response)
+    })
 })
 
 export default users

@@ -22,11 +22,11 @@ export class TaskRunner {
     return task
       .performTask()
       .then(success => {
-        winston.log('info', `Performed Task ${task.id}, which ${success ? 'succeeded' : 'failed'}`)
+        winston.log('info', `performTask() ${task.id} - ${success ? 'succeeded' : 'failed'}`)
         return task.useResults()
       })
       .then(success => {
-        return winston.log('info', `Used Results of Task ${task.id}, which ${success ? 'succeeded' : 'failed'}`)
+        return winston.log('info', `useResults() ${task.id} - ${success ? 'succeeded' : 'failed'}`)
       })
       .then(() => {
         return this.updateTask(task, TASK_STATUS.COMPLETE)
