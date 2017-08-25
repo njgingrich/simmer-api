@@ -34,9 +34,9 @@ export class TaskRunner {
   }
 
   runTasks(): void {
-    setInterval(() => {
+    let scheduler = () => {
       console.log('Looking for tasks...')
-      this.tasks.forEach((item, i) => {
+      this.tasks.forEach((item: TaskItem, i: number) => {
         if (item.time <= new Date().getTime()) {
           console.log(`Running task ${item.task.id}`)
           this.updateTask(item.task, TASK_STATUS.ACTIVE)
@@ -49,7 +49,9 @@ export class TaskRunner {
             })
         }
       })
-    }, 4000)
+      setTimeout(scheduler, 6000)
+    }
+    scheduler()
   }
 
   scheduleTask(task: Task, time: Date): void {
