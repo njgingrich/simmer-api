@@ -12,15 +12,37 @@ import {
 } from '../models/api'
 
 export function getUserSummary(req: GetUserSummaryRequest): Promise<GetUserSummaryResponse> {
+  let user: any
   return db
     .query(
       `SELECT id, display_name, last_logoff, profile_url, avatar_url
-                 FROM users
-                 WHERE id = $1`,
+        FROM users
+        WHERE id = $1`,
       [req.steam_id]
     )
     .then((res: any) => {
-      const user = res.rows[0]
+      user = res.rows[0]
+      return db.query(`SELECT app_id, today, week, two_weeks, forever
+        FROM playtimes
+        WHERE steam_id = $1`, [req.steam_id])
+    })
+    .then((res: any) => {
+      let totals: any = {
+        today: 0,
+        week: 0,
+        two_weeks: 0,
+        forever: 0
+      }
+      let games: any[] = []
+
+      res.rows.forEach((row: any) => {
+        totals.today += row.today
+        totals.week += row.week
+        totals.two_weeks += row.two_weeks
+        totals.foreveer += row.forever
+        games.push(row)
+      })
+
       return {
         status: HTTPStatus.OK,
         result: {
@@ -33,22 +55,8 @@ export function getUserSummary(req: GetUserSummaryRequest): Promise<GetUserSumma
             avatar: user.avatar_url,
           },
           playtimes: {
-            totals: {
-              today: 1,
-              week: 2,
-              two_weeks: 3,
-              forever: 4,
-            },
-            recent_games: [],
-            games: [
-              {
-                app_id: 'test',
-                today: 1,
-                week: 2,
-                two_weeks: 3,
-                forever: 4,
-              },
-            ],
+            totals,
+            games,
           },
         },
       }
