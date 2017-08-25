@@ -11,6 +11,7 @@ export class FetchUserSummaryTask extends Task {
   constructor(params: UserSummaryTaskParams) {
     super()
     this.info = { params: { steam_id: params.steam_id } }
+    this.type = 'FetchUserSummary'
     this.steam_id = params.steam_id
   }
 

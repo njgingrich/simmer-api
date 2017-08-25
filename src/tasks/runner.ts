@@ -35,20 +35,21 @@ export class TaskRunner {
 
   runTasks(): void {
     let scheduler = () => {
-      console.log('Looking for tasks...')
       this.tasks.forEach((item: TaskItem, i: number) => {
-        if (item.time <= new Date().getTime()) {
-          console.log(`Running task ${item.task.id}`)
-          this.updateTask(item.task, TASK_STATUS.ACTIVE)
-            .then(() => {
-              return this.runTask(item.task)
-            })
-            .then(() => {
-              console.log(`Removing task ${item.task.id} w/ index ${i}`)
-              this.tasks.splice(i, 1)
-            })
+        if (item.time <= new Date().getTime() && item.task.status === TASK_STATUS.SCHEDULED) {
+          winston.log('info', `Running task ${item.task.id} - ${item.task.type}`)
+          this.updateTask(item.task, TASK_STATUS.ACTIVE).then(() => {
+            return this.runTask(item.task)
+          })
         }
       })
+      for (let i = this.tasks.length - 1; i >= 0; i--) {
+        if (this.tasks[i].task.status === TASK_STATUS.ACTIVE) {
+          winston.log('info', `Removing task ${this.tasks[i].task.id} - ${this.tasks[i].task.type}`)
+          this.tasks.splice(i, 1)
+        }
+      }
+
       setTimeout(scheduler, 6000)
     }
     scheduler()
@@ -58,7 +59,6 @@ export class TaskRunner {
     this.tasks_count += 1
     task.id = this.tasks_count
     db.putTask(task).then(() => {
-      console.log(`adding task ${task.id}`)
       this.tasks.push({ task, time: time.getTime() })
       this.updateTask(task, TASK_STATUS.SCHEDULED)
     })

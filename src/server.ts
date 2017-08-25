@@ -34,8 +34,8 @@ function setup(): void {
   })
 
   const runner = new TaskRunner()
-  // runner.scheduleTask(new FetchGameInfoTask({ task_id: 0, app_id: '570' }), new Date())
-  // runner.scheduleTask(new FetchGameInfoTask({ task_id: 1, app_id: '377160' }), new Date())
+  runner.scheduleTask(new FetchGameInfoTask({ app_id: '570' }), new Date('2017-08-25T01:42:30Z'))
+  runner.scheduleTask(new FetchGameInfoTask({ app_id: '377160' }), new Date('2017-08-25T01:43:00Z'))
   runner.scheduleTask(new FetchUserSummaryTask({ steam_id: config.profile_id }), new Date())
   runner.scheduleTask(new FetchUserPlaytimesTask({ steam_id: config.profile_id }), new Date())
 

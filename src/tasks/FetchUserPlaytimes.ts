@@ -11,6 +11,7 @@ export class FetchUserPlaytimesTask extends Task {
   constructor(params: UserPlaytimesTaskParams) {
     super()
     this.info = { params: { steam_id: params.steam_id } }
+    this.type = 'FetchUserPlaytimes'
     this.steam_id = params.steam_id
   }
 

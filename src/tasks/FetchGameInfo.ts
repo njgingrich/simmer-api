@@ -11,6 +11,7 @@ export class FetchGameInfoTask extends Task {
   constructor(params: GameInfoTaskParams) {
     super()
     this.info = { params: { app_id: params.app_id } }
+    this.type = 'FetchGameInfo'
     this.app_id = params.app_id
   }
 

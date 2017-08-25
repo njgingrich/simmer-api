@@ -10,10 +10,12 @@ export enum TASK_STATUS {
 export abstract class Task {
   id: number
   info: {}
+  type: string
   status: TASK_STATUS
 
   constructor() {
     this.info = {}
+    this.type = ''
     this.status = TASK_STATUS.CREATED
   }
   abstract performTask(): Promise<boolean>
