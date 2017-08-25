@@ -4,7 +4,7 @@ import * as winston from 'winston'
 import app from './app'
 import * as steam from './api/steam'
 import * as api from './api'
-import { UserSummary } from './models/api'
+import { RecentGames, UserSummary } from './models/api'
 import { config } from './config'
 import { TaskRunner } from './tasks/runner'
 import { FetchGameInfoTask } from './tasks/FetchGameInfo'
@@ -18,7 +18,7 @@ server.on('listening', () => {
   console.log(`listening on port: ${config.port}`)
 })
 
-function setup(): void {
+const setup = function(): void {
   winston.add(winston.transports.File, {
     name: 'file#debug',
     filename: 'logs/simmer.debug.log',
@@ -34,10 +34,7 @@ function setup(): void {
   })
 
   const runner = new TaskRunner()
-  runner.scheduleTask(new FetchGameInfoTask({ app_id: '570' }), new Date('2017-08-25T01:42:30Z'))
-  runner.scheduleTask(new FetchGameInfoTask({ app_id: '377160' }), new Date('2017-08-25T01:43:00Z'))
-  runner.scheduleTask(new FetchUserSummaryTask({ steam_id: config.profile_id }), new Date())
-  runner.scheduleTask(new FetchUserPlaytimesTask({ steam_id: config.profile_id }), new Date())
+  loopTasks(runner)
 
   setTimeout(() => {
     api.getUserSummary({ steam_id: config.profile_id }).then(summary => {
@@ -51,4 +48,28 @@ function setup(): void {
       }
     })
   }, 3000)
+}
+
+const loopTasks = function(runner: TaskRunner): void {
+  const HOUR = 1000 * 60 * 60
+  const DAY = 1000 * 60 * 60 * 24
+  const hourly = () => {
+    winston.log('info', 'Running hourly tasks')
+    runner.scheduleTask(new FetchUserSummaryTask({ steam_id: config.profile_id }), new Date())
+    setTimeout(hourly, 30000)
+  }
+  const daily = () => {
+    winston.log('info', 'Running daily tasks')
+    runner.scheduleTask(new FetchUserPlaytimesTask({ steam_id: config.profile_id }), new Date())
+    api.getRecentGamesForUser({ steam_id: config.profile_id }).then(res => {
+      const gamesList = res.result as RecentGames
+      console.log('games list:', gamesList)
+      gamesList.games.forEach(app_id => {
+        runner.scheduleTask(new FetchGameInfoTask({ app_id }), new Date())
+      })
+    })
+    setTimeout(daily, 60000)
+  }
+  hourly()
+  daily()
 }

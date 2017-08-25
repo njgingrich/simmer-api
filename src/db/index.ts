@@ -32,17 +32,40 @@ export function putUserSummary(json: any): Promise<QueryResult> {
   )
 }
 
-export function putUserPlaytimes(steam_id: string, game: any) {
-  const today = game.two_weeks
-  const week = game.two_weeks
-  return query(
-    'INSERT INTO playtimes(steam_id, app_id, today, week, two_weeks, forever, last_fetch) VALUES ($1, $2, $3, $4, $5, $6, $7)' +
-      'ON CONFLICT ON CONSTRAINT playtimes_pkey DO UPDATE SET today = $3, week = $4, two_weeks = $5, forever = $6, last_fetch = $7',
-    [steam_id, game.app_id, today, week, game.two_weeks, game.forever, new Date().toISOString()]
-  )
+export function putUserPlaytimes(steam_id: string, game: any): Promise<QueryResult> {
+  return query('SELECT today, week, two_weeks, forever FROM playtimes WHERE steam_id = $1 AND app_id = $2', [
+    steam_id,
+    game.app_id,
+  ])
+    .then(result => {
+      if (result.rowCount === 1) {
+        const data = result.rows[0]
+        // game is what we just got from the API, while data is what we have stored in the database already
+        const new_hours = Math.max(game.two_weeks - data.two_weeks, 0)
+        const today = data.today + new_hours
+        const week = data.week + new_hours
+
+        return {
+          today,
+          week,
+        }
+      } else {
+        return {
+          today: 0,
+          week: 0,
+        }
+      }
+    })
+    .then(data => {
+      return query(
+        'INSERT INTO playtimes(steam_id, app_id, today, week, two_weeks, forever, last_fetch) VALUES ($1, $2, $3, $4, $5, $6, $7)' +
+          'ON CONFLICT ON CONSTRAINT playtimes_pkey DO UPDATE SET today = $3, week = $4, two_weeks = $5, forever = $6, last_fetch = $7',
+        [steam_id, game.app_id, data.today, data.week, game.two_weeks, game.forever, new Date().toISOString()]
+      )
+    })
 }
 
-export function putUserRecentGames(steam_id: string, games: any) {
+export function putUserRecentGames(steam_id: string, games: any): Promise<QueryResult> {
   return query('UPDATE users SET recent_games = $1 WHERE id = $2', [games, steam_id])
 }
 
@@ -65,7 +88,12 @@ export function putGameInfo(json: any): Promise<QueryResult> {
 
 export function putTask(task: Task): Promise<QueryResult> {
   winston.log('debug', `insert task ${task.id} with status ${task.status} in db`)
-  return query('INSERT INTO tasks(id, info, status) VALUES ($1, $2, $3)', [task.id, task.info, task.status])
+  return query('INSERT INTO tasks(id, info, type, status) VALUES ($1, $2, $3, $4)', [
+    task.id,
+    task.info,
+    task.type,
+    task.status,
+  ])
 }
 
 export function updateTaskStatus(task: Task): Promise<QueryResult> {

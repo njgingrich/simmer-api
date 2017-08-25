@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS playtimes (
 CREATE TABLE IF NOT EXISTS tasks (
   id integer NOT NULL,
   info jsonb NOT NULL,
+  type text NOT NULL,
   status integer NOT NULL,
   PRIMARY KEY(id)
 );
