@@ -34,3 +34,10 @@ CREATE TABLE IF NOT EXISTS playtimes (
   last_fetch timestamp NOT NULL,
   PRIMARY KEY(steam_id, app_id)
 );
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id integer NOT NULL,
+  info jsonb NOT NULL,
+  status integer NOT NULL,
+  PRIMARY KEY(id)
+);

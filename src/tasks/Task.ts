@@ -1,13 +1,20 @@
+import * as db from '../db'
+
 export enum TASK_STATUS {
-  CREATED,
-  ACTIVE,
-  COMPLETE,
+  CREATED = 0,
+  SCHEDULED = 1,
+  ACTIVE = 2,
+  COMPLETE = 3,
 }
 
 export abstract class Task {
   id: number
-  constructor(id: number) {
-    this.id = id
+  info: {}
+  status: TASK_STATUS
+
+  constructor() {
+    this.info = {}
+    this.status = TASK_STATUS.CREATED
   }
   abstract performTask(): Promise<boolean>
   abstract useResults(): Promise<boolean>

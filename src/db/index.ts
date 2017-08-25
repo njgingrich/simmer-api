@@ -1,5 +1,6 @@
 import { Pool, QueryResult } from 'pg'
 import * as winston from 'winston'
+import { Task } from '../tasks/Task'
 
 const pool = new Pool({
   host: 'localhost',
@@ -60,4 +61,14 @@ export function putGameInfo(json: any): Promise<QueryResult> {
       new Date().toISOString(),
     ]
   )
+}
+
+export function putTask(task: Task): Promise<QueryResult> {
+  winston.log('debug', `insert task ${task.id} with status ${task.status} in db`)
+  return query('INSERT INTO tasks(id, info, status) VALUES ($1, $2, $3)', [task.id, task.info, task.status])
+}
+
+export function updateTaskStatus(task: Task): Promise<QueryResult> {
+  winston.log('debug', `set task ${task.id} to status ${task.status} in db`)
+  return query('UPDATE tasks SET status = $1 WHERE id = $2', [task.status, task.id])
 }

@@ -34,10 +34,10 @@ function setup(): void {
   })
 
   const runner = new TaskRunner()
-  runner.scheduleTask(new FetchGameInfoTask({ task_id: 0, app_id: '570' }), new Date())
-  runner.scheduleTask(new FetchGameInfoTask({ task_id: 1, app_id: '377160' }), new Date())
-  runner.scheduleTask(new FetchUserSummaryTask({ task_id: 2, steam_id: config.profile_id }), new Date())
-  runner.scheduleTask(new FetchUserPlaytimesTask({ task_id: 3, steam_id: config.profile_id }), new Date())
+  // runner.scheduleTask(new FetchGameInfoTask({ task_id: 0, app_id: '570' }), new Date())
+  // runner.scheduleTask(new FetchGameInfoTask({ task_id: 1, app_id: '377160' }), new Date())
+  runner.scheduleTask(new FetchUserSummaryTask({ steam_id: config.profile_id }), new Date())
+  runner.scheduleTask(new FetchUserPlaytimesTask({ steam_id: config.profile_id }), new Date())
 
   setTimeout(() => {
     api.getUserSummary({ steam_id: config.profile_id }).then(summary => {
