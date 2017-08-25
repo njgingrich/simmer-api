@@ -54,16 +54,15 @@ const loopTasks = function(runner: TaskRunner): void {
   const HOUR = 1000 * 60 * 60
   const DAY = 1000 * 60 * 60 * 24
   const hourly = () => {
-    winston.log('info', 'Running hourly tasks')
+    winston.log('info', `Running hourly tasks at ${new Date().toUTCString()}`)
     runner.scheduleTask(new FetchUserSummaryTask({ steam_id: config.profile_id }), new Date())
     setTimeout(hourly, 30000)
   }
   const daily = () => {
-    winston.log('info', 'Running daily tasks')
+    winston.log('info', `Running daily tasks at ${new Date().toUTCString()}`)
     runner.scheduleTask(new FetchUserPlaytimesTask({ steam_id: config.profile_id }), new Date())
     api.getRecentGamesForUser({ steam_id: config.profile_id }).then(res => {
       const gamesList = res.result as RecentGames
-      console.log('games list:', gamesList)
       gamesList.games.forEach(app_id => {
         runner.scheduleTask(new FetchGameInfoTask({ app_id }), new Date())
       })
