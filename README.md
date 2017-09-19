@@ -4,6 +4,11 @@ Server with a postgres database that stores steam info for a user about recently
 ## Installation
 - Install postgres on your machine.
 - Update the config file with steam API key, user profile id, and postgres credentials.
+- `sudo -u postgres psql postgres`
+- `\password postgres`
+- `sudo -u postgres createuser pi`
+- `sudo -u postgres createdb -O pi simmer`
+- ``
 - `yarn resetdb`
 - `yarn install`
 
