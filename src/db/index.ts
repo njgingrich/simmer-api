@@ -4,7 +4,7 @@ import { Task } from '../tasks/Task'
 
 const pool = new Pool({
   host: 'localhost',
-  user: 'nathan',
+  user: 'pi',
   database: 'simmer',
   max: 20,
   idleTimeoutMillis: 30000,

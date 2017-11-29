@@ -8,7 +8,7 @@ Server with a postgres database that stores steam info for a user about recently
 - `\password postgres`
 - `sudo -u postgres createuser pi`
 - `sudo -u postgres createdb -O pi simmer`
-- ``
+- `yarn init`
 - `yarn resetdb`
 - `yarn install`
 

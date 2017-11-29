@@ -7,11 +7,12 @@
   "author": "njgingrich <njgingrich@gmail.com> https://njgingrich.com",
   "license": "MIT",
   "scripts": {
+    "init": "./initdb.sh",
     "compile": "rm -rf dist && ./node_modules/.bin/tsc",
     "start": "yarn run dev",
     "dev": "yarn run compile && nodemon --exec ./node_modules/.bin/ts-node -- ./dist/src/server",
     "test": "NODE_ENV=test mocha --opts mocha.opts",
-    "resetdb": "psql -f simmer.sql",
+    "resetdb": "psql -U pi -d simmer -h localhost -f simmer.sql",
     "prepublishOnly": "rm -rf dist && ./node_modules/.bin/tsc -p ./ --outDir dist/"
   },
   "devDependencies": {
